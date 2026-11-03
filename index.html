@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estacionamento Inteligente</title>
+    <!-- Vincula este HTML ao arquivo de estilos CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Monitoramento de Vaga</h1>
+        
+        <!-- Esta div simula a lâmpada/LED do sensor na tela. As classes mudarão via JS -->
+        <div id="status-luz" class="luz apagada"></div>
+        
+        <div class="info">
+            <p>Status: <strong id="status-texto">Conectando ao FastAPI...</strong></p>
+            <p>Distância: <strong id="distancia-texto">--</strong> cm</p>
+        </div>
+    </div>
+
+    <!-- Áudio de alarme online (padrão de relógio digital) usado no estado crítico -->
+    <audio id="audio-alarme" src="https://google.com" loop></audio>
+
+    <!-- Vincula este HTML à lógica do script JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
