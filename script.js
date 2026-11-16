@@ -1,10 +1,10 @@
-const IP_RASPBERRY = "192.168.137.154"; 
+const IP_RASPBERRY = "192.168.137.1";
 const URL_API = `http://${IP_RASPBERRY}:8000/leituras`;
 
 const luzElemento = document.getElementById("status-luz");
 const statusTexto = document.getElementById("status-texto");
 const distanciaTexto = document.getElementById("distancia-texto");
-const alarmeSonoro = document.getElementById("audio-alarme");
+const corpoTabela = document.getElementById("corpo-tabela");
 
 function consultarVaga() {
     fetch(URL_API)
@@ -12,48 +12,64 @@ function consultarVaga() {
         .then(dados => {
             
             
-            if (!dados || dados.distancia === undefined) {
-                statusTexto.innerText = "Sem registros ou banco vazio";
-                return;
-            }
+        const atual = dados.atual;
+            
+        if (!atual || atual.distancia === undefined) {
+            statusTexto.innerText = "Sem registros ou banco vazio";
+            return;
+        }
 
-            distanciaTexto.innerText = dados.distancia;
+        
+        distanciaTexto.innerText = atual.distancia;
 
-            luzElemento.className = "luz";
-            alarmeSonoro.pause();
+        luzElemento.className = "luz";
 
-            switch (dados.status_code) {
-                case 0:
-                    statusTexto.innerText = "Vaga Livre.";
-                    statusTexto.style.color = "#00e676"; 
-                    luzElemento.classList.add("verde");
-                    break;
+        switch (atual.status_code) {
+        case 0:
+            statusTexto.innerText = "Vaga Livre.";
+            statusTexto.style.color = "#00e676";
+            luzElemento.classList.add("verde");
+            break;
 
-                case 1: 
-                    statusTexto.innerText = "Manobrando.";
-                    statusTexto.style.color = "#ffea00"; 
-                    luzElemento.classList.add("piscando-amarelo"); 
-                    break;
+        case 1:
+            statusTexto.innerText = "Manobrando.";
+            statusTexto.style.color = "#ffea00";
+            luzElemento.classList.add("piscando-amarelo");
+            break;
 
-                case 2:
-                    statusTexto.innerText = "Vaga Ocupada.";
-                    statusTexto.style.color = "#ff9100"; 
-                    luzElemento.classList.add("vermelha-fixa"); 
-                    break;
+        case 2:
+            statusTexto.innerText = "Vaga Ocupada.";
+            statusTexto.style.color = "#ff9100";
+            luzElemento.classList.add("vermelha-fixa");
+            break;
 
-                case 3:
-                    statusTexto.innerText = "PERIGO! PARE O VEÍCULO!";
-                    statusTexto.style.color = "#ff1744"; 
-                    luzElemento.classList.add("piscando-vermelho"); 
-                    
-                    alarmeSonoro.play().catch(() => {
-                        console.log("Clique na tela para habilitar as notificações sonoras.");
-                    });
-                    break;
+        case 3:
+            statusTexto.innerText = "PERIGO! PARE O VEÍCULO!";
+            statusTexto.style.color = "#ff1744";
+            luzElemento.classList.add("piscando-vermelho");
+                   
+            alarmeSonoro.play().catch(() => {
+                console.log("Clique na tela para habilitar as notificações sonoras.");
+            });
+            break;
 
-                default:
-                    statusTexto.innerText = dados.status;
-                    luzElemento.classList.add("apagada");
+            default:
+                statusTexto.innerText = atual.status;
+                luzElemento.classList.add("apagada");
+        }
+
+            
+            corpoTabela.innerHTML = "";
+            if (dados.historico) {
+                dados.historico.forEach(reg => {
+                    const linha = document.createElement("tr");
+                    linha.innerHTML = `
+                        <td>${reg.horario}</td>
+                        <td>${reg.distancia} cm</td>
+                        <td>Risco de Colisão</td>
+                    `;
+                    corpoTabela.appendChild(linha);
+                });
             }
         })
         .catch(error => {
@@ -64,4 +80,5 @@ function consultarVaga() {
         });
 }
 
-setInterval(consultarVaga, 1000);
+
+setInterval(consultarVaga, 250);
